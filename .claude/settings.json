@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -lc 'python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/enforce-principles.py\"'",
+            "command": "python3 \"/home/roberto/Vexa Dyad/.claude/hooks/enforce-principles.py\"",
             "timeout": 20
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -lc 'python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-tool-use.py\"'",
+            "command": "python3 \"/home/roberto/Vexa Dyad/.claude/hooks/pre-tool-use.py\"",
             "timeout": 60
           }
         ]
