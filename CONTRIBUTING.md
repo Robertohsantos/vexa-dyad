@@ -1,16 +1,28 @@
 # Contributing
 
-Dyad is still a very early-stage project, thus the codebase is rapidly changing.
+Vexa is a fork of Dyad, enhanced with the BMAD protocol and enterprise features. The codebase is rapidly evolving.
 
-Before opening a pull request, please open an issue and discuss whether the change makes sense in Dyad. Ensuring a cohesive user experience sometimes means we can't include every possible feature or we need to consider the long-term design of how we want to support a feature area.
+Before opening a pull request, please open an issue and discuss whether the change makes sense in Vexa. Ensuring a cohesive user experience sometimes means we can't include every possible feature or we need to consider the long-term design of how we want to support a feature area.
+
+## Working with Claude Code
+
+- Start with `claude` in the project terminal
+- Use `/memory` to edit memories and `/hooks` to check hooks
+- Follow the principles in `.claude/CLAUDE.md` (SRP, SSOT, DRY, KISS, YAGNI)
+
+## Commits and Pull Requests
+
+- Use Conventional Commits format
+- Follow the PR template in `.github/`
+- **Important**: Do not include internal terms in PRs (enforced by pr-guard workflow)
 
 ## More than code contributions
 
-Something that I really appreciate are all the non-code contributions, such as reporting bugs, writing feature requests and participating on [Dyad's sub-reddit](https://www.reddit.com/r/dyadbuilders).
+Something that I really appreciate are all the non-code contributions, such as reporting bugs, writing feature requests and participating in the Vexa community.
 
 ## Development
 
-Dyad is an Electron app.
+Vexa is an Electron app based on Dyad.
 
 **Install dependencies:**
 
