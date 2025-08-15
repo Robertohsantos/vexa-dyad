@@ -81,7 +81,7 @@ Join our growing community of AI app builders!
 
 **Vexa** is open-source (Apache 2.0 licensed), based on the original [Dyad](https://github.com/dyad-sh/dyad) project.
 
-If you're interested in contributing to Vexa, please read our [contributing](./docs/CONTRIBUTING.md) doc.
+If you're interested in contributing to Vexa, please read our [contributing](./CONTRIBUTING.md) doc.
 
 ## 📖 Documentation
 

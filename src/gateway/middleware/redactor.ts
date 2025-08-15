@@ -1,4 +1,4 @@
-// src/middleware/redactor.ts
+// src/gateway/middleware/redactor.ts
 export type RegenerateFn = (opts: { original: string; instruction: string }) => Promise<string>;
 
 const BANNED_REGEX = /(?:^|[^a-zA-Z])(BMAD|bmad-?method|bmad-?code-?org|team[-_ ]?fullstack\.ya?ml|orchestrator\s*BMAD)(?:$|[^a-zA-Z])/i;

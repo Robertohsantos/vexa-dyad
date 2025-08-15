@@ -20,7 +20,7 @@
 
 ## Padrões do Projeto
 - Respeitar limites de pastas e camadas definidos na especificação de arquitetura.
-- Artefatos JSON devem seguir os schemas em `schemas/` e incluir citações quando aplicável.
+- Artefatos JSON devem seguir os schemas em `src/schemas/` e incluir citações quando aplicável.
 
 ## Convenções
 - Idioma padrão: **pt-BR**; datas **DD/MM/AAAA**.
