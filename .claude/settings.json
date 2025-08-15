@@ -1,4 +1,6 @@
 {
+  // IMPORTANTE: Após modificar este arquivo, reinicie o Claude Code
+  // As configurações são carregadas na memória ao iniciar e não são recarregadas automaticamente
   "hooks": {
     "UserPromptSubmit": [
       {
