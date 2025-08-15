@@ -1,0 +1,33 @@
+name: pr-guard
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guardar contra termos internos em título/corpo/commits
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const bannedRegex = /(?:^|[^a-zA-Z])(BMAD|bmad-?method|bmad-?code-?org|team[-_ ]?fullstack\.ya?ml|orchestrator\s*BMAD)(?:$|[^a-zA-Z])/i;
+            function normalize(s){
+              return (s||'').normalize('NFKD').replace(/\p{M}/gu,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
+            }
+            function containsBanned(text){
+              if(!text) return false;
+              if(bannedRegex.test(text)) return true;
+              const n = normalize(text);
+              return n.includes('bmad') || n.includes('bmadmethod') || n.includes('bmadcodeorg') || n.includes('teamfullstackyaml') || n.includes('orchestratorbmad');
+            }
+            const pr = context.payload.pull_request;
+            const fields = [pr.title, pr.body];
+            const {data: commits} = await github.rest.pulls.listCommits({
+              owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number
+            });
+            for (const c of commits) fields.push(c.commit.message);
+            const hits = fields.filter(containsBanned);
+            if (hits.length) {
+              core.setFailed(`PR contém termos internos proibidos. Remova menções como 'BMAD' e similares.`);
+            }

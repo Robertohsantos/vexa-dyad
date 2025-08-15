@@ -1,0 +1,4 @@
+feat(planner): descreva a mudança curta
+
+Contexto: <por que esta mudança?>
+Refs: #<issue>

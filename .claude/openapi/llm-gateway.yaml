@@ -1,0 +1,104 @@
+openapi: 3.1.0
+info:
+  title: LLM Gateway (OpenAI-compatible Chat Completions)
+  version: 1.0.0
+  description: >
+    Proxy entre o Claude Code e provedores de modelo (ex.: OpenRouter).
+    Compatível com **OpenAI Chat Completions** (`/v1/chat/completions`).
+servers:
+  - url: https://gateway.sua-org.com
+paths:
+  /v1/chat/completions:
+    post:
+      operationId: createChatCompletion
+      summary: Cria uma conclusão de chat
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionsRequest'
+      responses:
+        '200':
+          description: Resposta de chat (streaming SSE opcional)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionsResponse'
+        '4XX':
+          description: Erro do cliente
+        '5XX':
+          description: Erro do servidor
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant, tool]
+        content:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: object
+                properties:
+                  type: { type: string, enum: [text, image_url] }
+                  text: { type: string }
+                  image_url: { type: string }
+    ToolDefinition:
+      type: object
+      properties:
+        type: { type: string, enum: [function] }
+        function:
+          type: object
+          properties:
+            name: { type: string }
+            description: { type: string }
+            parameters: { type: object }
+    ChatCompletionsRequest:
+      type: object
+      required: [model, messages]
+      properties:
+        model:
+          type: string
+          example: z-ai/glm-4.5
+        messages:
+          type: array
+          items: { $ref: '#/components/schemas/ChatMessage' }
+        stream: { type: boolean, default: true }
+        temperature: { type: number, minimum: 0, maximum: 2 }
+        top_p: { type: number, minimum: 0, maximum: 1 }
+        tools:
+          type: array
+          items: { $ref: '#/components/schemas/ToolDefinition' }
+        tool_choice:
+          oneOf:
+            - type: string
+            - type: object
+    ChatCompletionsResponse:
+      type: object
+      properties:
+        id: { type: string }
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              index: { type: integer }
+              message: { $ref: '#/components/schemas/ChatMessage' }
+              finish_reason: { type: string }
+        usage:
+          type: object
+          properties:
+            prompt_tokens: { type: integer }
+            completion_tokens: { type: integer }
+            total_tokens: { type: integer }

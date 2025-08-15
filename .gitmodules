@@ -1,0 +1,3 @@
+[submodule "upstream/dyad"]
+	path = upstream/dyad
+	url = https://github.com/Robertohsantos/dyad.git

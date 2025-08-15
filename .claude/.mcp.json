@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "bmad-core": {
+      "type": "http",
+      "url": "https://core.sua-org.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      }
+    },
+    "web-policy": {
+      "type": "http",
+      "url": "https://core.sua-org.com/mcp/web",
+      "headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      }
+    }
+  }
+}
