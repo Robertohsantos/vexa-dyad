@@ -2,21 +2,21 @@ import { normalizePath } from "../../../shared/normalizePath";
 import log from "electron-log";
 import { SqlQuery } from "../../lib/schemas";
 
-const logger = log.scope("dyad_tag_parser");
+const logger = log.scope("vexa_tag_parser");
 
-export function getDyadWriteTags(fullResponse: string): {
+export function getVexaWriteTags(fullResponse: string): {
   path: string;
   content: string;
   description?: string;
 }[] {
-  const dyadWriteRegex = /<dyad-write([^>]*)>([\s\S]*?)<\/dyad-write>/gi;
+  const vexaWriteRegex = /<vexa-write([^>]*)>([\s\S]*?)<\/vexa-write>/gi;
   const pathRegex = /path="([^"]+)"/;
   const descriptionRegex = /description="([^"]+)"/;
 
   let match;
   const tags: { path: string; content: string; description?: string }[] = [];
 
-  while ((match = dyadWriteRegex.exec(fullResponse)) !== null) {
+  while ((match = vexaWriteRegex.exec(fullResponse)) !== null) {
     const attributesString = match[1];
     let content = match[2].trim();
 
@@ -39,7 +39,7 @@ export function getDyadWriteTags(fullResponse: string): {
       tags.push({ path: normalizePath(path), content, description });
     } else {
       logger.warn(
-        "Found <dyad-write> tag without a valid 'path' attribute:",
+        "Found <vexa-write> tag without a valid 'path' attribute:",
         match[0],
       );
     }
@@ -47,15 +47,15 @@ export function getDyadWriteTags(fullResponse: string): {
   return tags;
 }
 
-export function getDyadRenameTags(fullResponse: string): {
+export function getVexaRenameTags(fullResponse: string): {
   from: string;
   to: string;
 }[] {
-  const dyadRenameRegex =
-    /<dyad-rename from="([^"]+)" to="([^"]+)"[^>]*>([\s\S]*?)<\/dyad-rename>/g;
+  const vexaRenameRegex =
+    /<vexa-rename from="([^"]+)" to="([^"]+)"[^>]*>([\s\S]*?)<\/vexa-rename>/g;
   let match;
   const tags: { from: string; to: string }[] = [];
-  while ((match = dyadRenameRegex.exec(fullResponse)) !== null) {
+  while ((match = vexaRenameRegex.exec(fullResponse)) !== null) {
     tags.push({
       from: normalizePath(match[1]),
       to: normalizePath(match[2]),
@@ -64,46 +64,46 @@ export function getDyadRenameTags(fullResponse: string): {
   return tags;
 }
 
-export function getDyadDeleteTags(fullResponse: string): string[] {
-  const dyadDeleteRegex =
-    /<dyad-delete path="([^"]+)"[^>]*>([\s\S]*?)<\/dyad-delete>/g;
+export function getVexaDeleteTags(fullResponse: string): string[] {
+  const vexaDeleteRegex =
+    /<vexa-delete path="([^"]+)"[^>]*>([\s\S]*?)<\/vexa-delete>/g;
   let match;
   const paths: string[] = [];
-  while ((match = dyadDeleteRegex.exec(fullResponse)) !== null) {
+  while ((match = vexaDeleteRegex.exec(fullResponse)) !== null) {
     paths.push(normalizePath(match[1]));
   }
   return paths;
 }
 
-export function getDyadAddDependencyTags(fullResponse: string): string[] {
-  const dyadAddDependencyRegex =
-    /<dyad-add-dependency packages="([^"]+)">[^<]*<\/dyad-add-dependency>/g;
+export function getVexaAddDependencyTags(fullResponse: string): string[] {
+  const vexaAddDependencyRegex =
+    /<vexa-add-dependency packages="([^"]+)">[^<]*<\/vexa-add-dependency>/g;
   let match;
   const packages: string[] = [];
-  while ((match = dyadAddDependencyRegex.exec(fullResponse)) !== null) {
+  while ((match = vexaAddDependencyRegex.exec(fullResponse)) !== null) {
     packages.push(...match[1].split(" "));
   }
   return packages;
 }
 
-export function getDyadChatSummaryTag(fullResponse: string): string | null {
-  const dyadChatSummaryRegex =
-    /<dyad-chat-summary>([\s\S]*?)<\/dyad-chat-summary>/g;
-  const match = dyadChatSummaryRegex.exec(fullResponse);
+export function getVexaChatSummaryTag(fullResponse: string): string | null {
+  const vexaChatSummaryRegex =
+    /<vexa-chat-summary>([\s\S]*?)<\/vexa-chat-summary>/g;
+  const match = vexaChatSummaryRegex.exec(fullResponse);
   if (match && match[1]) {
     return match[1].trim();
   }
   return null;
 }
 
-export function getDyadExecuteSqlTags(fullResponse: string): SqlQuery[] {
-  const dyadExecuteSqlRegex =
-    /<dyad-execute-sql([^>]*)>([\s\S]*?)<\/dyad-execute-sql>/g;
+export function getVexaExecuteSqlTags(fullResponse: string): SqlQuery[] {
+  const vexaExecuteSqlRegex =
+    /<vexa-execute-sql([^>]*)>([\s\S]*?)<\/vexa-execute-sql>/g;
   const descriptionRegex = /description="([^"]+)"/;
   let match;
   const queries: { content: string; description?: string }[] = [];
 
-  while ((match = dyadExecuteSqlRegex.exec(fullResponse)) !== null) {
+  while ((match = vexaExecuteSqlRegex.exec(fullResponse)) !== null) {
     const attributesString = match[1] || "";
     let content = match[2].trim();
     const descriptionMatch = descriptionRegex.exec(attributesString);
@@ -125,13 +125,13 @@ export function getDyadExecuteSqlTags(fullResponse: string): SqlQuery[] {
   return queries;
 }
 
-export function getDyadCommandTags(fullResponse: string): string[] {
-  const dyadCommandRegex =
-    /<dyad-command type="([^"]+)"[^>]*><\/dyad-command>/g;
+export function getVexaCommandTags(fullResponse: string): string[] {
+  const vexaCommandRegex =
+    /<vexa-command type="([^"]+)"[^>]*><\/vexa-command>/g;
   let match;
   const commands: string[] = [];
 
-  while ((match = dyadCommandRegex.exec(fullResponse)) !== null) {
+  while ((match = vexaCommandRegex.exec(fullResponse)) !== null) {
     commands.push(match[1]);
   }
 

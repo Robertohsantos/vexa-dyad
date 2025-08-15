@@ -10,11 +10,11 @@ const { _electron: electron } = require("playwright");
 (async () => {
   const browser = await electron.launch({
     args: [
-      "../../out/dyad-darwin-arm64/dyad.app/Contents/Resources/app.asar/.vite/build/main.js",
+      "../../out/vexa-darwin-arm64/vexa.app/Contents/Resources/app.asar/.vite/build/main.js",
       "--enable-logging",
-      "--user-data-dir=/tmp/dyad-e2e-tests",
+      "--user-data-dir=/tmp/vexa-e2e-tests",
     ],
-    executablePath: "../../out/dyad-darwin-arm64/dyad.app/Contents/MacOS/dyad",
+    executablePath: "../../out/vexa-darwin-arm64/vexa.app/Contents/MacOS/vexa",
   });
   const context = await browser.context();
   await context.route("**/*", (route) => route.continue());

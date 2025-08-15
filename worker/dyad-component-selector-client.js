@@ -1,5 +1,5 @@
 (() => {
-  const OVERLAY_ID = "__dyad_overlay__";
+  const OVERLAY_ID = "__vexa_overlay__";
   let overlay, label;
 
   // The possible states are:
@@ -96,8 +96,8 @@
       label.appendChild(editLine);
     }
 
-    const name = el.dataset.dyadName || "<unknown>";
-    const file = (el.dataset.dyadId || "").split(":")[0];
+    const name = el.dataset.vexaName || "<unknown>";
+    const file = (el.dataset.vexaId || "").split(":")[0];
 
     const nameEl = document.createElement("div");
     nameEl.textContent = name;
@@ -116,7 +116,7 @@
     if (state.type !== "inspecting") return;
 
     let el = e.target;
-    while (el && !el.dataset.dyadId) el = el.parentElement;
+    while (el && !el.dataset.vexaId) el = el.parentElement;
 
     if (state.element === el) return;
     state.element = el;
@@ -138,9 +138,9 @@
 
     window.parent.postMessage(
       {
-        type: "dyad-component-selected",
-        id: state.element.dataset.dyadId,
-        name: state.element.dataset.dyadName,
+        type: "vexa-component-selected",
+        id: state.element.dataset.vexaId,
+        name: state.element.dataset.vexaName,
       },
       "*",
     );
@@ -174,29 +174,29 @@
   /* ---------- message bridge -------------------------------------------- */
   window.addEventListener("message", (e) => {
     if (e.source !== window.parent) return;
-    if (e.data.type === "activate-dyad-component-selector") activate();
-    if (e.data.type === "deactivate-dyad-component-selector") deactivate();
+    if (e.data.type === "activate-vexa-component-selector") activate();
+    if (e.data.type === "deactivate-vexa-component-selector") deactivate();
   });
 
   function initializeComponentSelector() {
     if (!document.body) {
       console.error(
-        "Dyad component selector initialization failed: document.body not found.",
+        "Vexa component selector initialization failed: document.body not found.",
       );
       return;
     }
     setTimeout(() => {
-      if (document.body.querySelector("[data-dyad-id]")) {
+      if (document.body.querySelector("[data-vexa-id]")) {
         window.parent.postMessage(
           {
-            type: "dyad-component-selector-initialized",
+            type: "vexa-component-selector-initialized",
           },
           "*",
         );
-        console.debug("Dyad component selector initialized");
+        console.debug("Vexa component selector initialized");
       } else {
         console.warn(
-          "Dyad component selector not initialized because no DOM elements were tagged",
+          "Vexa component selector not initialized because no DOM elements were tagged",
         );
       }
     }, 0);

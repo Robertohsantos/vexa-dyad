@@ -19,7 +19,7 @@ import {
   SUPABASE_AVAILABLE_SYSTEM_PROMPT,
   SUPABASE_NOT_AVAILABLE_SYSTEM_PROMPT,
 } from "../../prompts/supabase_prompt";
-import { getDyadAppPath } from "../../paths/paths";
+import { getVexaAppPath } from "../../paths/paths";
 import { readSettings } from "../../main/settings";
 import type { ChatResponseEnd, ChatStreamParams } from "../ipc_types";
 import { extractCodebase, readFileWithCache } from "../../utils/codebase";
@@ -51,11 +51,11 @@ import { generateProblemReport } from "../processors/tsc";
 import { createProblemFixPrompt } from "@/shared/problem_prompt";
 import { AsyncVirtualFileSystem } from "../../../shared/VirtualFilesystem";
 import {
-  getDyadAddDependencyTags,
-  getDyadWriteTags,
-  getDyadDeleteTags,
-  getDyadRenameTags,
-} from "../utils/dyad_tag_parser";
+  getVexaAddDependencyTags,
+  getVexaWriteTags,
+  getVexaDeleteTags,
+  getVexaRenameTags,
+} from "../utils/vexa_tag_parser";
 import { fileExists } from "../utils/file_utils";
 import { FileUploadsState } from "../utils/file_uploads_state";
 import { OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
@@ -73,7 +73,7 @@ const activeStreams = new Map<number, AbortController>();
 const partialResponses = new Map<number, string>();
 
 // Directory for storing temporary files
-const TEMP_DIR = path.join(os.tmpdir(), "dyad-attachments");
+const TEMP_DIR = path.join(os.tmpdir(), "vexa-attachments");
 
 // Common helper functions
 const TEXT_FILE_EXTENSIONS = [
@@ -138,7 +138,7 @@ async function processStreamChunks({
         inThinkingBlock = true;
       }
 
-      chunk += escapeDyadTags(part.textDelta);
+      chunk += escapeVexaTags(part.textDelta);
     }
 
     if (!chunk) {
@@ -253,7 +253,7 @@ export function registerChatStreamHandlers() {
               originalName: attachment.name,
             });
 
-            // Add instruction for AI to use dyad-write tag
+            // Add instruction for AI to use vexa-write tag
             attachmentInfo += `\n\nFile to upload to codebase: ${attachment.name} (file id: ${fileId})\n`;
           } else {
             // For chat-context, use the existing logic
@@ -261,8 +261,8 @@ export function registerChatStreamHandlers() {
             // If it's a text-based file, try to include the content
             if (await isTextFile(filePath)) {
               try {
-                attachmentInfo += `<dyad-text-attachment filename="${attachment.name}" type="${attachment.type}" path="${filePath}">
-                </dyad-text-attachment>
+                attachmentInfo += `<vexa-text-attachment filename="${attachment.name}" type="${attachment.type}" path="${filePath}">
+                </vexa-text-attachment>
                 \n\n`;
               } catch (err) {
                 logger.error(`Error reading file content: ${err}`);
@@ -279,7 +279,7 @@ export function registerChatStreamHandlers() {
         try {
           const componentFileContent = await readFile(
             path.join(
-              getDyadAppPath(chat.app.path),
+              getVexaAppPath(chat.app.path),
               req.selectedComponent.relativePath,
             ),
             "utf8",
@@ -370,7 +370,7 @@ ${componentSnippet}
         // Normal AI processing for non-test prompts
         const settings = readSettings();
 
-        const appPath = getDyadAppPath(updatedChat.app.path);
+        const appPath = getVexaAppPath(updatedChat.app.path);
         const chatContext = req.selectedComponent
           ? {
               contextPaths: [
@@ -472,7 +472,7 @@ ${componentSnippet}
         }
 
         let systemPrompt = constructSystemPrompt({
-          aiRules: await readAiRules(getDyadAppPath(updatedChat.app.path)),
+          aiRules: await readAiRules(getVexaAppPath(updatedChat.app.path)),
           chatMode: settings.selectedChatMode,
         });
 
@@ -522,7 +522,7 @@ ${componentSnippet}
           );
         // If there's mixed attachments (e.g. some upload to codebase attachments and some upload images as chat context attachemnts)
         // we will just include the file upload system prompt, otherwise the AI gets confused and doesn't reliably
-        // print out the dyad-write tags.
+        // print out the vexa-write tags.
         // Usually, AI models will want to use the image as reference to generate code (e.g. UI mockups) anyways, so
         // it's not that critical to include the image analysis instructions.
         if (hasUploadedAttachments) {
@@ -530,14 +530,14 @@ ${componentSnippet}
   
 When files are attached to this conversation, upload them to the codebase using this exact format:
 
-<dyad-write path="path/to/destination/filename.ext" description="Upload file to codebase">
+<vexa-write path="path/to/destination/filename.ext" description="Upload file to codebase">
 DYAD_ATTACHMENT_X
-</dyad-write>
+</vexa-write>
 
 Example for file with id of DYAD_ATTACHMENT_0:
-<dyad-write path="src/components/Button.jsx" description="Upload file to codebase">
+<vexa-write path="src/components/Button.jsx" description="Upload file to codebase">
 DYAD_ATTACHMENT_0
-</dyad-write>
+</vexa-write>
 
   `;
         } else if (hasImageAttachments) {
@@ -590,7 +590,7 @@ This conversation includes one or more image attachments. When the user uploads 
             // and eats up extra tokens.
             content:
               settings.selectedChatMode === "ask"
-                ? removeDyadTags(removeNonEssentialTags(msg.content))
+                ? removeVexaTags(removeNonEssentialTags(msg.content))
                 : removeNonEssentialTags(msg.content),
           })),
         ];
@@ -635,11 +635,11 @@ This conversation includes one or more image attachments. When the user uploads 
           chatMessages: CoreMessage[];
           modelClient: ModelClient;
         }) => {
-          const dyadRequestId = uuidv4();
+          const vexaRequestId = uuidv4();
           if (isEngineEnabled) {
             logger.log(
               "sending AI request to engine with request id:",
-              dyadRequestId,
+              vexaRequestId,
             );
           } else {
             logger.log("sending AI request");
@@ -650,10 +650,10 @@ This conversation includes one or more image attachments. When the user uploads 
             maxRetries: 2,
             model: modelClient.model,
             providerOptions: {
-              "dyad-engine": {
-                dyadRequestId,
+              "vexa-engine": {
+                vexaRequestId,
               },
-              "dyad-gateway": getExtraProviderOptions(
+              "vexa-gateway": getExtraProviderOptions(
                 modelClient.builtinProviderId,
                 settings,
               ),
@@ -677,7 +677,7 @@ This conversation includes one or more image attachments. When the user uploads 
               }
               const message = errorMessage || JSON.stringify(error);
               const requestIdPrefix = isEngineEnabled
-                ? `[Request ID: ${dyadRequestId}] `
+                ? `[Request ID: ${vexaRequestId}] `
                 : "";
               event.sender.send(
                 "chat:response:error",
@@ -747,16 +747,16 @@ This conversation includes one or more image attachments. When the user uploads 
           if (
             !abortController.signal.aborted &&
             settings.selectedChatMode !== "ask" &&
-            hasUnclosedDyadWrite(fullResponse)
+            hasUnclosedVexaWrite(fullResponse)
           ) {
             let continuationAttempts = 0;
             while (
-              hasUnclosedDyadWrite(fullResponse) &&
+              hasUnclosedVexaWrite(fullResponse) &&
               continuationAttempts < 2 &&
               !abortController.signal.aborted
             ) {
               logger.warn(
-                `Received unclosed dyad-write tag, attempting to continue, attempt #${continuationAttempts + 1}`,
+                `Received unclosed vexa-write tag, attempting to continue, attempt #${continuationAttempts + 1}`,
               );
               continuationAttempts++;
 
@@ -783,7 +783,7 @@ This conversation includes one or more image attachments. When the user uploads 
               }
             }
           }
-          const addDependencies = getDyadAddDependencyTags(fullResponse);
+          const addDependencies = getVexaAddDependencyTags(fullResponse);
           if (
             !abortController.signal.aborted &&
             // If there are dependencies, we don't want to auto-fix problems
@@ -797,7 +797,7 @@ This conversation includes one or more image attachments. When the user uploads 
               // IF auto-fix is enabled
               let problemReport = await generateProblemReport({
                 fullResponse,
-                appPath: getDyadAppPath(updatedChat.app.path),
+                appPath: getVexaAppPath(updatedChat.app.path),
               });
 
               let autoFixAttempts = 0;
@@ -808,14 +808,14 @@ This conversation includes one or more image attachments. When the user uploads 
                 autoFixAttempts < 2 &&
                 !abortController.signal.aborted
               ) {
-                fullResponse += `<dyad-problem-report summary="${problemReport.problems.length} problems">
+                fullResponse += `<vexa-problem-report summary="${problemReport.problems.length} problems">
 ${problemReport.problems
   .map(
     (problem) =>
       `<problem file="${escapeXml(problem.file)}" line="${problem.line}" column="${problem.column}" code="${problem.code}">${escapeXml(problem.message)}</problem>`,
   )
   .join("\n")}
-</dyad-problem-report>`;
+</vexa-problem-report>`;
 
                 logger.info(
                   `Attempting to auto-fix problems, attempt #${autoFixAttempts + 1}`,
@@ -824,15 +824,15 @@ ${problemReport.problems
                 const problemFixPrompt = createProblemFixPrompt(problemReport);
 
                 const virtualFileSystem = new AsyncVirtualFileSystem(
-                  getDyadAppPath(updatedChat.app.path),
+                  getVexaAppPath(updatedChat.app.path),
                   {
                     fileExists: (fileName: string) => fileExists(fileName),
                     readFile: (fileName: string) => readFileWithCache(fileName),
                   },
                 );
-                const writeTags = getDyadWriteTags(fullResponse);
-                const renameTags = getDyadRenameTags(fullResponse);
-                const deletePaths = getDyadDeleteTags(fullResponse);
+                const writeTags = getVexaWriteTags(fullResponse);
+                const renameTags = getVexaRenameTags(fullResponse);
+                const deletePaths = getVexaDeleteTags(fullResponse);
                 virtualFileSystem.applyResponseChanges({
                   deletePaths,
                   renameTags,
@@ -895,7 +895,7 @@ ${problemReport.problems
 
                 problemReport = await generateProblemReport({
                   fullResponse,
-                  appPath: getDyadAppPath(updatedChat.app.path),
+                  appPath: getVexaAppPath(updatedChat.app.path),
                 });
               }
             } catch (error) {
@@ -943,9 +943,9 @@ ${problemReport.problems
 
       // Only save the response and process it if we weren't aborted
       if (!abortController.signal.aborted && fullResponse) {
-        // Scrape from: <dyad-chat-summary>Renaming profile file</dyad-chat-title>
+        // Scrape from: <vexa-chat-summary>Renaming profile file</vexa-chat-title>
         const chatTitle = fullResponse.match(
-          /<dyad-chat-summary>(.*?)<\/dyad-chat-summary>/,
+          /<vexa-chat-summary>(.*?)<\/vexa-chat-summary>/,
         );
         if (chatTitle) {
           await db
@@ -1115,7 +1115,7 @@ async function replaceTextAttachmentWithContent(
       // Replace the placeholder tag with the full content
       const escapedPath = filePath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const tagPattern = new RegExp(
-        `<dyad-text-attachment filename="[^"]*" type="[^"]*" path="${escapedPath}">\\s*<\\/dyad-text-attachment>`,
+        `<vexa-text-attachment filename="[^"]*" type="[^"]*" path="${escapedPath}">\\s*<\\/vexa-text-attachment>`,
         "g",
       );
 
@@ -1208,18 +1208,18 @@ function removeThinkingTags(text: string): string {
 
 export function removeProblemReportTags(text: string): string {
   const problemReportRegex =
-    /<dyad-problem-report[^>]*>[\s\S]*?<\/dyad-problem-report>/g;
+    /<vexa-problem-report[^>]*>[\s\S]*?<\/vexa-problem-report>/g;
   return text.replace(problemReportRegex, "").trim();
 }
 
-export function removeDyadTags(text: string): string {
-  const dyadRegex = /<dyad-[^>]*>[\s\S]*?<\/dyad-[^>]*>/g;
-  return text.replace(dyadRegex, "").trim();
+export function removeVexaTags(text: string): string {
+  const vexaRegex = /<vexa-[^>]*>[\s\S]*?<\/vexa-[^>]*>/g;
+  return text.replace(vexaRegex, "").trim();
 }
 
-export function hasUnclosedDyadWrite(text: string): boolean {
-  // Find the last opening dyad-write tag
-  const openRegex = /<dyad-write[^>]*>/g;
+export function hasUnclosedVexaWrite(text: string): boolean {
+  // Find the last opening vexa-write tag
+  const openRegex = /<vexa-write[^>]*>/g;
   let lastOpenIndex = -1;
   let match;
 
@@ -1234,19 +1234,19 @@ export function hasUnclosedDyadWrite(text: string): boolean {
 
   // Look for a closing tag after the last opening tag
   const textAfterLastOpen = text.substring(lastOpenIndex);
-  const hasClosingTag = /<\/dyad-write>/.test(textAfterLastOpen);
+  const hasClosingTag = /<\/vexa-write>/.test(textAfterLastOpen);
 
   return !hasClosingTag;
 }
 
-function escapeDyadTags(text: string): string {
-  // Escape dyad tags in reasoning content
+function escapeVexaTags(text: string): string {
+  // Escape vexa tags in reasoning content
   // We are replacing the opening tag with a look-alike character
-  // to avoid issues where thinking content includes dyad tags
+  // to avoid issues where thinking content includes vexa tags
   // and are mishandled by:
   // 1. FE markdown parser
   // 2. Main process response processor
-  return text.replace(/<dyad/g, "＜dyad").replace(/<\/dyad/g, "＜/dyad");
+  return text.replace(/<vexa/g, "＜vexa").replace(/<\/vexa/g, "＜/vexa");
 }
 
 const CODEBASE_PROMPT_PREFIX = "This is my codebase.";

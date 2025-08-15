@@ -254,9 +254,9 @@ export const CLOUD_PROVIDERS: Record<
     gatewayPrefix: "openrouter/",
   },
   auto: {
-    displayName: "Dyad",
-    websiteUrl: "https://academy.dyad.sh/settings",
-    gatewayPrefix: "dyad/",
+    displayName: "Vexa",
+    websiteUrl: "https://academy.vexa.sh/settings",
+    gatewayPrefix: "vexa/",
   },
 };
 

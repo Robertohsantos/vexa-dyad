@@ -1,24 +1,24 @@
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { DyadWrite } from "./DyadWrite";
-import { DyadRename } from "./DyadRename";
-import { DyadDelete } from "./DyadDelete";
-import { DyadAddDependency } from "./DyadAddDependency";
-import { DyadExecuteSql } from "./DyadExecuteSql";
-import { DyadAddIntegration } from "./DyadAddIntegration";
-import { DyadEdit } from "./DyadEdit";
-import { DyadCodebaseContext } from "./DyadCodebaseContext";
-import { DyadThink } from "./DyadThink";
+import { VexaWrite } from "./VexaWrite";
+import { VexaRename } from "./VexaRename";
+import { VexaDelete } from "./VexaDelete";
+import { VexaAddDependency } from "./VexaAddDependency";
+import { VexaExecuteSql } from "./VexaExecuteSql";
+import { VexaAddIntegration } from "./VexaAddIntegration";
+import { VexaEdit } from "./VexaEdit";
+import { VexaCodebaseContext } from "./VexaCodebaseContext";
+import { VexaThink } from "./VexaThink";
 import { CodeHighlight } from "./CodeHighlight";
 import { useAtomValue } from "jotai";
 import { isStreamingAtom } from "@/atoms/chatAtoms";
 import { CustomTagState } from "./stateTypes";
-import { DyadOutput } from "./DyadOutput";
-import { DyadProblemSummary } from "./DyadProblemSummary";
+import { VexaOutput } from "./VexaOutput";
+import { VexaProblemSummary } from "./VexaProblemSummary";
 import { IpcClient } from "@/ipc/ipc_client";
 
-interface DyadMarkdownParserProps {
+interface VexaMarkdownParserProps {
   content: string;
 }
 
@@ -67,9 +67,9 @@ export const VanillaMarkdownParser = ({ content }: { content: string }) => {
 };
 
 /**
- * Custom component to parse markdown content with Dyad-specific tags
+ * Custom component to parse markdown content with Vexa-specific tags
  */
-export const DyadMarkdownParser: React.FC<DyadMarkdownParserProps> = ({
+export const VexaMarkdownParser: React.FC<VexaMarkdownParserProps> = ({
   content,
 }) => {
   const isStreaming = useAtomValue(isStreamingAtom);
@@ -111,17 +111,17 @@ function preprocessUnclosedTags(content: string): {
   inProgressTags: Map<string, Set<number>>;
 } {
   const customTagNames = [
-    "dyad-write",
-    "dyad-rename",
-    "dyad-delete",
-    "dyad-add-dependency",
-    "dyad-execute-sql",
-    "dyad-add-integration",
-    "dyad-output",
-    "dyad-problem-report",
-    "dyad-chat-summary",
-    "dyad-edit",
-    "dyad-codebase-context",
+    "vexa-write",
+    "vexa-rename",
+    "vexa-delete",
+    "vexa-add-dependency",
+    "vexa-execute-sql",
+    "vexa-add-integration",
+    "vexa-output",
+    "vexa-problem-report",
+    "vexa-chat-summary",
+    "vexa-edit",
+    "vexa-codebase-context",
     "think",
   ];
 
@@ -177,17 +177,17 @@ function parseCustomTags(content: string): ContentPiece[] {
   const { processedContent, inProgressTags } = preprocessUnclosedTags(content);
 
   const customTagNames = [
-    "dyad-write",
-    "dyad-rename",
-    "dyad-delete",
-    "dyad-add-dependency",
-    "dyad-execute-sql",
-    "dyad-add-integration",
-    "dyad-output",
-    "dyad-problem-report",
-    "dyad-chat-summary",
-    "dyad-edit",
-    "dyad-codebase-context",
+    "vexa-write",
+    "vexa-rename",
+    "vexa-delete",
+    "vexa-add-dependency",
+    "vexa-execute-sql",
+    "vexa-add-integration",
+    "vexa-output",
+    "vexa-problem-report",
+    "vexa-chat-summary",
+    "vexa-edit",
+    "vexa-codebase-context",
     "think",
   ];
 
@@ -276,7 +276,7 @@ function renderCustomTag(
   switch (tag) {
     case "think":
       return (
-        <DyadThink
+        <VexaThink
           node={{
             properties: {
               state: getState({ isStreaming, inProgress }),
@@ -284,11 +284,11 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadThink>
+        </VexaThink>
       );
-    case "dyad-write":
+    case "vexa-write":
       return (
-        <DyadWrite
+        <VexaWrite
           node={{
             properties: {
               path: attributes.path || "",
@@ -298,12 +298,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadWrite>
+        </VexaWrite>
       );
 
-    case "dyad-rename":
+    case "vexa-rename":
       return (
-        <DyadRename
+        <VexaRename
           node={{
             properties: {
               from: attributes.from || "",
@@ -312,12 +312,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadRename>
+        </VexaRename>
       );
 
-    case "dyad-delete":
+    case "vexa-delete":
       return (
-        <DyadDelete
+        <VexaDelete
           node={{
             properties: {
               path: attributes.path || "",
@@ -325,12 +325,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadDelete>
+        </VexaDelete>
       );
 
-    case "dyad-add-dependency":
+    case "vexa-add-dependency":
       return (
-        <DyadAddDependency
+        <VexaAddDependency
           node={{
             properties: {
               packages: attributes.packages || "",
@@ -338,12 +338,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadAddDependency>
+        </VexaAddDependency>
       );
 
-    case "dyad-execute-sql":
+    case "vexa-execute-sql":
       return (
-        <DyadExecuteSql
+        <VexaExecuteSql
           node={{
             properties: {
               state: getState({ isStreaming, inProgress }),
@@ -352,12 +352,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadExecuteSql>
+        </VexaExecuteSql>
       );
 
-    case "dyad-add-integration":
+    case "vexa-add-integration":
       return (
-        <DyadAddIntegration
+        <VexaAddIntegration
           node={{
             properties: {
               provider: attributes.provider || "",
@@ -365,12 +365,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadAddIntegration>
+        </VexaAddIntegration>
       );
 
-    case "dyad-edit":
+    case "vexa-edit":
       return (
-        <DyadEdit
+        <VexaEdit
           node={{
             properties: {
               path: attributes.path || "",
@@ -380,12 +380,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadEdit>
+        </VexaEdit>
       );
 
-    case "dyad-codebase-context":
+    case "vexa-codebase-context":
       return (
-        <DyadCodebaseContext
+        <VexaCodebaseContext
           node={{
             properties: {
               files: attributes.files || "",
@@ -394,28 +394,28 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadCodebaseContext>
+        </VexaCodebaseContext>
       );
 
-    case "dyad-output":
+    case "vexa-output":
       return (
-        <DyadOutput
+        <VexaOutput
           type={attributes.type as "warning" | "error"}
           message={attributes.message}
         >
           {content}
-        </DyadOutput>
+        </VexaOutput>
       );
 
-    case "dyad-problem-report":
+    case "vexa-problem-report":
       return (
-        <DyadProblemSummary summary={attributes.summary}>
+        <VexaProblemSummary summary={attributes.summary}>
           {content}
-        </DyadProblemSummary>
+        </VexaProblemSummary>
       );
 
-    case "dyad-chat-summary":
-      // Don't render anything for dyad-chat-summary
+    case "vexa-chat-summary":
+      // Don't render anything for vexa-chat-summary
       return null;
 
     default:

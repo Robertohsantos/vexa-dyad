@@ -11,13 +11,13 @@ import {
 import { CodeHighlight } from "./CodeHighlight";
 import { CustomTagState } from "./stateTypes";
 
-interface DyadExecuteSqlProps {
+interface VexaExecuteSqlProps {
   children?: ReactNode;
   node?: any;
   description?: string;
 }
 
-export const DyadExecuteSql: React.FC<DyadExecuteSqlProps> = ({
+export const VexaExecuteSql: React.FC<VexaExecuteSqlProps> = ({
   children,
   node,
   description,

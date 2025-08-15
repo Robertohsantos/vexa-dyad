@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Brain, ChevronDown, ChevronUp, Loader } from "lucide-react";
-import { VanillaMarkdownParser } from "./DyadMarkdownParser";
+import { VanillaMarkdownParser } from "./VexaMarkdownParser";
 import { CustomTagState } from "./stateTypes";
 
-interface DyadThinkProps {
+interface VexaThinkProps {
   node?: any;
   children?: React.ReactNode;
 }
 
-export const DyadThink: React.FC<DyadThinkProps> = ({ children, node }) => {
+export const VexaThink: React.FC<VexaThinkProps> = ({ children, node }) => {
   const state = node?.properties?.state as CustomTagState;
   const inProgress = state === "pending";
   const [isExpanded, setIsExpanded] = useState(inProgress);

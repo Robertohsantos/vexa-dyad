@@ -11,14 +11,14 @@ import {
 import { CodeHighlight } from "./CodeHighlight";
 import { CustomTagState } from "./stateTypes";
 
-interface DyadWriteProps {
+interface VexaWriteProps {
   children?: ReactNode;
   node?: any;
   path?: string;
   description?: string;
 }
 
-export const DyadWrite: React.FC<DyadWriteProps> = ({
+export const VexaWrite: React.FC<VexaWriteProps> = ({
   children,
   node,
   path: pathProp,

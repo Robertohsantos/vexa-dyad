@@ -103,7 +103,7 @@ const validInvokeChannels = [
   "open-ios",
   "open-android",
   "check-problems",
-  "restart-dyad",
+  "restart-vexa",
   "get-templates",
   "portal:migrate-create",
   // Test-only channels

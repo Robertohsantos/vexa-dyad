@@ -12,7 +12,7 @@ import type {
 } from "../ipc_types";
 import fs from "node:fs";
 import path from "node:path";
-import { getDyadAppPath, getUserDataPath } from "../../paths/paths";
+import { getVexaAppPath, getUserDataPath } from "../../paths/paths";
 import { spawn } from "node:child_process";
 import git from "isomorphic-git";
 import { promises as fsPromises } from "node:fs";
@@ -148,7 +148,7 @@ async function executeAppLocalNode({
     // This is a hacky heuristic to pick up when drizzle is asking for user
     // to select from one of a few choices. We automatically pick the first
     // option because it's usually a good default choice. We guard this with
-    // isNeon because: 1) only Neon apps (for the official Dyad templates) should
+    // isNeon because: 1) only Neon apps (for the official Vexa templates) should
     // get this template and 2) it's safer to do this with Neon apps because
     // their databases have point in time restore built-in.
     if (isNeon && message.includes("created or renamed from another")) {
@@ -182,7 +182,7 @@ async function executeAppLocalNode({
           onStarted: (proxyUrl) => {
             safeSend(event.sender, "app:output", {
               type: "stdout",
-              message: `[dyad-proxy-server]started=[${proxyUrl}] original=[${urlMatch[1]}]`,
+              message: `[vexa-proxy-server]started=[${proxyUrl}] original=[${urlMatch[1]}]`,
               appId,
             });
           },
@@ -232,7 +232,7 @@ async function killProcessOnPort(port: number): Promise<void> {
 }
 
 export function registerAppHandlers() {
-  handle("restart-dyad", async () => {
+  handle("restart-vexa", async () => {
     app.relaunch();
     app.quit();
   });
@@ -244,7 +244,7 @@ export function registerAppHandlers() {
       params: CreateAppParams,
     ): Promise<{ app: any; chatId: number }> => {
       const appPath = params.name;
-      const fullAppPath = getDyadAppPath(appPath);
+      const fullAppPath = getVexaAppPath(appPath);
       if (fs.existsSync(fullAppPath)) {
         throw new Error(`App already exists at: ${fullAppPath}`);
       }
@@ -287,7 +287,7 @@ export function registerAppHandlers() {
       // Create initial commit
       const commitHash = await gitCommit({
         path: fullAppPath,
-        message: "Init Dyad app",
+        message: "Init Vexa app",
       });
 
       // Update chat with initial commit hash
@@ -325,8 +325,8 @@ export function registerAppHandlers() {
         throw new Error("Original app not found.");
       }
 
-      const originalAppPath = getDyadAppPath(originalApp.path);
-      const newAppPath = getDyadAppPath(newAppName);
+      const originalAppPath = getVexaAppPath(originalApp.path);
+      const newAppPath = getVexaAppPath(newAppName);
 
       // 3. Copy the app folder
       try {
@@ -359,7 +359,7 @@ export function registerAppHandlers() {
         // Create initial commit
         await gitCommit({
           path: newAppPath,
-          message: "Init Dyad app",
+          message: "Init Vexa app",
         });
       }
 
@@ -392,7 +392,7 @@ export function registerAppHandlers() {
     }
 
     // Get app files
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getVexaAppPath(app.path);
     let files: string[] = [];
 
     try {
@@ -430,7 +430,7 @@ export function registerAppHandlers() {
     });
     return {
       apps: allApps,
-      appBasePath: getDyadAppPath("$APP_BASE_PATH"),
+      appBasePath: getVexaAppPath("$APP_BASE_PATH"),
     };
   });
 
@@ -445,7 +445,7 @@ export function registerAppHandlers() {
         throw new Error("App not found");
       }
 
-      const appPath = getDyadAppPath(app.path);
+      const appPath = getVexaAppPath(app.path);
       const fullPath = path.join(appPath, filePath);
 
       // Check if the path is within the app directory (security check)
@@ -502,7 +502,7 @@ export function registerAppHandlers() {
 
         logger.debug(`Starting app ${appId} in path ${app.path}`);
 
-        const appPath = getDyadAppPath(app.path);
+        const appPath = getVexaAppPath(app.path);
         try {
           // Kill any orphaned process on port 32100 (in case previous run left it)
           await killProcessOnPort(32100);
@@ -618,7 +618,7 @@ export function registerAppHandlers() {
             throw new Error("App not found");
           }
 
-          const appPath = getDyadAppPath(app.path);
+          const appPath = getVexaAppPath(app.path);
 
           // Remove node_modules if requested
           if (removeNodeModules) {
@@ -675,7 +675,7 @@ export function registerAppHandlers() {
         throw new Error("App not found");
       }
 
-      const appPath = getDyadAppPath(app.path);
+      const appPath = getVexaAppPath(app.path);
       const fullPath = path.join(appPath, filePath);
 
       // Check if the path is within the app directory (security check)
@@ -783,7 +783,7 @@ export function registerAppHandlers() {
         }
 
         // Delete app files
-        const appPath = getDyadAppPath(app.path);
+        const appPath = getVexaAppPath(app.path);
         try {
           await fsPromises.rm(appPath, { recursive: true, force: true });
         } catch (error: any) {
@@ -847,8 +847,8 @@ export function registerAppHandlers() {
           }
         }
 
-        const oldAppPath = getDyadAppPath(app.path);
-        const newAppPath = getDyadAppPath(appPath);
+        const oldAppPath = getVexaAppPath(app.path);
+        const newAppPath = getVexaAppPath(appPath);
         // Only move files if needed
         if (newAppPath !== oldAppPath) {
           // Move app files
@@ -968,11 +968,11 @@ export function registerAppHandlers() {
     // Doing this last because it's the most time-consuming and the least important
     // in terms of resetting the app state.
     logger.log("removing all app files...");
-    const dyadAppPath = getDyadAppPath(".");
-    if (fs.existsSync(dyadAppPath)) {
-      await fsPromises.rm(dyadAppPath, { recursive: true, force: true });
+    const vexaAppPath = getVexaAppPath(".");
+    if (fs.existsSync(vexaAppPath)) {
+      await fsPromises.rm(vexaAppPath, { recursive: true, force: true });
       // Recreate the base directory
-      await fsPromises.mkdir(dyadAppPath, { recursive: true });
+      await fsPromises.mkdir(vexaAppPath, { recursive: true });
     }
     logger.log("all app files removed.");
     logger.log("reset all complete.");
@@ -995,7 +995,7 @@ export function registerAppHandlers() {
       throw new Error("App not found");
     }
 
-    const appPath = getDyadAppPath(app.path);
+    const appPath = getVexaAppPath(app.path);
 
     return withLock(appId, async () => {
       try {

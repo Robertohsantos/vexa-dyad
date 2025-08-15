@@ -2,14 +2,14 @@ import type React from "react";
 import type { ReactNode } from "react";
 import { FileEdit } from "lucide-react";
 
-interface DyadRenameProps {
+interface VexaRenameProps {
   children?: ReactNode;
   node?: any;
   from?: string;
   to?: string;
 }
 
-export const DyadRename: React.FC<DyadRenameProps> = ({
+export const VexaRename: React.FC<VexaRenameProps> = ({
   children,
   node,
   from: fromProp,

@@ -6,19 +6,19 @@ import remarkGfm from "remark-gfm";
 export function ChatErrorBox({
   onDismiss,
   error,
-  isDyadProEnabled,
+  isVexaProEnabled,
 }: {
   onDismiss: () => void;
   error: string;
-  isDyadProEnabled: boolean;
+  isVexaProEnabled: boolean;
 }) {
   if (error.includes("doesn't have a free quota tier")) {
     return (
       <ChatErrorContainer onDismiss={onDismiss}>
         {error}
         <span className="ml-1">
-          <ExternalLink href="https://dyad.sh/pro">
-            Access with Dyad Pro.
+          <ExternalLink href="https://vexa.sh/pro">
+            Access with Vexa Pro.
           </ExternalLink>
         </span>
       </ChatErrorContainer>
@@ -32,8 +32,8 @@ export function ChatErrorBox({
       <ChatErrorContainer onDismiss={onDismiss}>
         {error}
         <span className="ml-1">
-          <ExternalLink href="https://dyad.sh/pro">
-            Upgrade to Dyad Pro.
+          <ExternalLink href="https://vexa.sh/pro">
+            Upgrade to Vexa Pro.
           </ExternalLink>
         </span>
       </ChatErrorContainer>
@@ -44,22 +44,22 @@ export function ChatErrorBox({
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          Looks like you don't have a valid Dyad Pro key.{" "}
-          <ExternalLink href="https://dyad.sh/pro">
-            Upgrade to Dyad Pro
+          Looks like you don't have a valid Vexa Pro key.{" "}
+          <ExternalLink href="https://vexa.sh/pro">
+            Upgrade to Vexa Pro
           </ExternalLink>{" "}
           today.
         </span>
       </ChatInfoContainer>
     );
   }
-  if (isDyadProEnabled && error.includes("ExceededBudget:")) {
+  if (isVexaProEnabled && error.includes("ExceededBudget:")) {
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          You have used all of your Dyad AI credits this month.{" "}
-          <ExternalLink href="https://academy.dyad.sh/subscription">
-            Upgrade to Dyad Max
+          You have used all of your Vexa AI credits this month.{" "}
+          <ExternalLink href="https://academy.vexa.sh/subscription">
+            Upgrade to Vexa Max
           </ExternalLink>{" "}
           and get more AI credits
         </span>

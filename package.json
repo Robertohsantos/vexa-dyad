@@ -1,12 +1,12 @@
 {
-  "name": "dyad",
-  "productName": "dyad",
+  "name": "vexa",
+  "productName": "Vexa",
   "version": "0.17.0",
-  "description": "Free, local, open-source AI app builder",
+  "description": "Free, local, open-source AI app builder powered by BMAD protocol",
   "main": ".vite/build/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dyad-sh/dyad.git"
+    "url": "https://github.com/Robertohsantos/vexa-dyad.git"
   },
   "engines": {
     "node": ">=20"
@@ -14,9 +14,9 @@
   "scripts": {
     "clean": "rm -rf out && rm -rf scaffold/node_modules",
     "start": "electron-forge start",
-    "dev:engine": "DYAD_ENGINE_URL=http://localhost:8080/v1 npm start",
-    "staging:engine": "DYAD_ENGINE_URL=https://staging---dyad-llm-engine-kq7pivehnq-uc.a.run.app/v1 npm start",
-    "staging:gateway": "DYAD_GATEWAY_URL=https://staging---litellm-gcp-cloud-run-kq7pivehnq-uc.a.run.app/v1 npm start",
+    "dev:engine": "VEXA_ENGINE_URL=http://localhost:8080/v1 npm start",
+    "staging:engine": "VEXA_ENGINE_URL=https://staging---vexa-llm-engine-kq7pivehnq-uc.a.run.app/v1 npm start",
+    "staging:gateway": "VEXA_GATEWAY_URL=https://staging---litellm-gcp-cloud-run-kq7pivehnq-uc.a.run.app/v1 npm start",
     "package": "npm run clean && electron-forge package",
     "make": "npm run clean && electron-forge make",
     "publish": "npm run clean && electron-forge publish",
